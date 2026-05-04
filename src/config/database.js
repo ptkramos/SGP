@@ -45,6 +45,7 @@ function initializeDatabase() {
             type TEXT NOT NULL CHECK(type IN ('reuniao', 'treinamento')),
             event_date DATE NOT NULL,
             scheduled_now BOOLEAN DEFAULT 0,
+            status TEXT DEFAULT 'active',
             created_by INTEGER NOT NULL,
             pdf_data BLOB,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -92,9 +93,11 @@ function initializeDatabase() {
     // Migrações (colunas adicionais para bancos existentes)
     try {
         db.exec(`ALTER TABLE presences ADD COLUMN participant_cpf TEXT`);
-    } catch (e) {
-        // Coluna já existe, ignorar
-    }
+    } catch (e) {}
+
+    try {
+        db.exec(`ALTER TABLE lists ADD COLUMN status TEXT DEFAULT 'active'`);
+    } catch (e) {}
 
     console.log('✅ Banco de dados inicializado com sucesso');
 }
