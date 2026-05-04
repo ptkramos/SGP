@@ -8,9 +8,10 @@ const presenceRoutes = require('./routes/presenceRoutes');
 
 const app = express();
 
-// View engine
+// Configurações
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.set('trust proxy', 1); // Confiar no proxy (Railway, Render, etc) para detectar HTTPS
 
 // Middlewares
 app.use(express.urlencoded({ extended: true }));
@@ -24,14 +25,17 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         maxAge: 24 * 60 * 60 * 1000, // 24 horas
-        httpOnly: true
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production' // Cookie seguro em produção
     }
 }));
 
 // Disponibilizar dados de sessão para todas as views
 app.use((req, res, next) => {
+    const protocol = req.protocol;
+    const host = req.get('host');
     res.locals.user = req.session.user || null;
-    res.locals.baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+    res.locals.baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
     next();
 });
 

@@ -60,7 +60,9 @@ const listController = {
                 return res.redirect('/gerenciar');
             }
 
-            const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+            const protocol = req.protocol;
+            const host = req.get('host');
+            const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
             const confirmUrl = `${baseUrl}/confirmar/${list.code}`;
             const qrDataUrl = await qrCodeService.generateDataUrl(confirmUrl);
 
@@ -114,7 +116,9 @@ const listController = {
             const presences = presenceModel.findByList(list.id);
             const today = new Date().toISOString().split('T')[0];
             
-            const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+            const protocol = req.protocol;
+            const host = req.get('host');
+            const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
             const confirmUrl = `${baseUrl}/confirmar/${list.code}`;
             const qrDataUrl = await qrCodeService.generateDataUrl(confirmUrl);
 
