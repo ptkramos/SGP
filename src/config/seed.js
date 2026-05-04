@@ -30,8 +30,11 @@ async function seed() {
     `).run('patrick.ramos', passwordHash2, 'Patrick Ramos', 'admin', 'TI');
 
     console.log('✅ Seed executado com sucesso!');
-    console.log('👤 Admin: admin / admin123');
-    console.log('👤 Patrick: patrick.ramos / 12345678900');
 }
 
-seed().catch(console.error);
+module.exports = { seed };
+
+// Se rodar diretamente: node src/config/seed.js
+if (require.main === module) {
+    seed().catch(console.error);
+}

@@ -8,6 +8,10 @@ const PORT = process.env.PORT || 3000;
 // Inicializar banco de dados
 initializeDatabase();
 
+// Seed automático (cria admin se banco estiver vazio)
+const { seed } = require('./src/config/seed');
+seed().catch(err => console.error('Erro no seed automático:', err));
+
 // Iniciar job de limpeza automática
 startCleanupJob();
 
