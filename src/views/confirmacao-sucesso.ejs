@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+
+<div class="page-wrapper">
+    <div class="confirm-layout">
+        <div class="card">
+            <div class="success-container">
+                <div class="success-checkmark">
+                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <h1 class="success-title">Presença Confirmada!</h1>
+                <p class="success-message">
+                    <strong><%= participantName %></strong>, sua presença na 
+                    <strong><%= list.typeLabel %></strong> "<%= list.title %>" foi registrada com sucesso.
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">
+                    Você pode fechar esta página.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

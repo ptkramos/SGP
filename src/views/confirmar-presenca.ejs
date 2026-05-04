@@ -1,0 +1,152 @@
+<%- include('partials/header') %>
+
+<div class="page-wrapper">
+    <div class="confirm-layout">
+        <div class="logo-header" style="display: flex; justify-content: center;">
+            <img src="/images/logo-sgp.webp" alt="SGP - Sistema de Gerenciamento de Presença">
+        </div>
+
+        <div class="card">
+            <% if (error) { %>
+                <div class="alert alert--error" style="display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="triangle-alert" class="w-5 h-5 flex-shrink-0"></i> <span><%= error %></span>
+                </div>
+                <% if (!list) { %>
+                    <div style="text-align: center; margin-top: 16px;">
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Verifique o link ou QR Code e tente novamente.</p>
+                    </div>
+                <% } %>
+            <% } else if (list) { %>
+                <h1 class="card__title">Confirmar Presença</h1>
+                
+                <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px; padding: 8px 16px; border-radius: var(--radius-sm);">
+                    <img src="/images/<%= list.type === 'reuniao' ? 'reuniao.png' : 'treinamento.png' %>" alt="Tipo de Evento" style="width: 48px; height: 48px; object-fit: contain; flex-shrink: 0;">
+                    <div style="text-align: left; overflow: hidden; max-width: 100%;">
+                        <strong style="color: var(--secondary); font-size: 1.1rem; display: block; margin-bottom: 2px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= list.title %></strong>
+                        <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <%= list.typeLabel %> &bull; <%= list.dateFormatted %>
+                        </span>
+                    </div>
+                </div>
+
+                <form action="/confirmar/<%= list.code %>" method="POST" id="form-confirmar">
+                    <div class="form-group">
+                        <label for="participantCpf" class="label-required">
+                            CPF
+                            <i data-lucide="asterisk" style="width: 12px; height: 12px; color: var(--error); flex-shrink: 0;"></i>
+                        </label>
+                        <input type="text" name="participantCpf" class="form-input" placeholder="000.000.000-00" required id="participantCpf" maxlength="14" inputmode="numeric">
+                        <small id="cpf-status" style="display: none; margin-top: 4px; font-size: 0.8rem;"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="participantName" class="label-required">
+                            Nome Completo
+                            <i data-lucide="asterisk" style="width: 12px; height: 12px; color: var(--error); flex-shrink: 0;"></i>
+                        </label>
+                        <input type="text" name="participantName" class="form-input" placeholder="Seu nome completo" required id="participantName"
+                            pattern="^\s*\S+\s+\S+.*$" title="Informe pelo menos nome e sobrenome">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="participantRole" class="label-required">
+                            Cargo
+                            <i data-lucide="asterisk" style="width: 12px; height: 12px; color: var(--error); flex-shrink: 0;"></i>
+                        </label>
+                        <input type="text" name="participantRole" class="form-input" placeholder="Seu cargo" required id="participantRole">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="participantSector" class="label-required">
+                            Setor
+                            <i data-lucide="asterisk" style="width: 12px; height: 12px; color: var(--error); flex-shrink: 0;"></i>
+                        </label>
+                        <input type="text" name="participantSector" class="form-input" placeholder="Seu setor" required id="participantSector">
+                    </div>
+
+                    <button type="submit" class="btn btn--primary btn--lg" id="btn-confirmar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i data-lucide="check-circle" class="w-5 h-5"></i> Confirmar Presença
+                    </button>
+                </form>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+// Máscara de CPF
+const cpfInput = document.getElementById('participantCpf');
+const nameInput = document.getElementById('participantName');
+const roleInput = document.getElementById('participantRole');
+const sectorInput = document.getElementById('participantSector');
+const cpfStatus = document.getElementById('cpf-status');
+
+if (cpfInput) {
+    cpfInput.addEventListener('input', function(e) {
+        let v = e.target.value.replace(/\D/g, '');
+        if (v.length > 11) v = v.slice(0, 11);
+        if (v.length > 9) {
+            v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+        } else if (v.length > 6) {
+            v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+        } else if (v.length > 3) {
+            v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+        }
+        e.target.value = v;
+    });
+
+    // Auto-fill ao sair do campo CPF (quando completo)
+    cpfInput.addEventListener('blur', async function() {
+        const cleanCpf = this.value.replace(/\D/g, '');
+        if (cleanCpf.length !== 11) return;
+
+        try {
+            const res = await fetch('/api/participante/' + cleanCpf);
+            if (res.ok) {
+                const data = await res.json();
+                
+                // Preencher e travar campos
+                nameInput.value = data.fullName || '';
+                nameInput.readOnly = true;
+                nameInput.style.background = 'var(--bg-body)';
+                nameInput.style.cursor = 'not-allowed';
+
+                roleInput.value = data.roleTitle || '';
+                roleInput.readOnly = true;
+                roleInput.style.background = 'var(--bg-body)';
+                roleInput.style.cursor = 'not-allowed';
+
+                sectorInput.value = data.sector || '';
+                sectorInput.readOnly = true;
+                sectorInput.style.background = 'var(--bg-body)';
+                sectorInput.style.cursor = 'not-allowed';
+
+                cpfStatus.textContent = '✓ Dados encontrados';
+                cpfStatus.style.color = 'var(--success-dark)';
+                cpfStatus.style.display = 'block';
+            } else {
+                // CPF novo - liberar campos para preenchimento
+                nameInput.readOnly = false;
+                nameInput.style.background = '';
+                nameInput.style.cursor = '';
+
+                roleInput.readOnly = false;
+                roleInput.style.background = '';
+                roleInput.style.cursor = '';
+
+                sectorInput.readOnly = false;
+                sectorInput.style.background = '';
+                sectorInput.style.cursor = '';
+
+                cpfStatus.textContent = 'Primeiro acesso — preencha seus dados';
+                cpfStatus.style.color = 'var(--primary-dark)';
+                cpfStatus.style.display = 'block';
+            }
+        } catch (err) {
+            console.error('Erro ao buscar CPF:', err);
+        }
+    });
+}
+</script>
+
+<%- include('partials/footer') %>

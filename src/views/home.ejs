@@ -1,0 +1,25 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="page-wrapper">
+
+            <div class="bubbles">
+                <a href="/criar-lista" class="bubble" id="bubble-criar">
+                    <div class="flex justify-center mb-4">
+                        <img src="/images/criar_lista.png" alt="Criar Lista" class="w-16 h-16 object-contain">
+                    </div>
+                    <div class="bubble__title">Criar Lista</div>
+                    <div class="bubble__desc">Crie uma nova lista de presença</div>
+                </a>
+
+                <a href="/gerenciar" class="bubble" id="bubble-confirmar">
+                    <div class="flex justify-center mb-4">
+                        <img src="/images/gerenciar.png" alt="Gerenciar" class="w-16 h-16 object-contain">
+                    </div>
+                    <div class="bubble__title">Gerenciar</div>
+                    <div class="bubble__desc">Veja e gerencie suas listas criadas</div>
+                </a>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>

@@ -1,0 +1,63 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="page-wrapper page-wrapper--top">
+            <div class="container">
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; gap: 12px;">
+                    <h1 class="card__title"
+                        style="margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        Gerenciar</h1>
+                    <a href="/criar-lista" class="btn btn--primary btn--lg"
+                        style="width: auto; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0;">
+                        <i data-lucide="plus" class="w-5 h-5"></i> Nova Lista
+                    </a>
+                </div>
+
+                <% if (lists.length===0) { %>
+                    <div class="empty-state">
+                        <div class="empty-state__icon"><i data-lucide="clipboard-list"
+                                style="width: 48px; height: 48px; stroke: #ccc; margin: 0 auto;"></i></div>
+                        <p class="empty-state__text">Você ainda não criou nenhuma lista de presença.</p>
+                        <a href="/criar-lista" class="btn btn--primary">Criar Primeira Lista</a>
+                    </div>
+                    <% } else { %>
+                        <div class="list-grid">
+                            <% lists.forEach(list=> { %>
+                                <a href="/lista/<%= list.code %>"
+                                    class="list-card list-card--<%= list.isActive ? 'active' : (list.isFuture ? 'future' : 'expired') %>"
+                                    id="list-<%= list.code %>">
+                                    <img src="/images/<%= list.type === 'reuniao' ? 'reuniao.png' : 'treinamento.png' %>" alt="<%= list.typeLabel %>" style="width: 42px; height: 42px; object-fit: contain; flex-shrink: 0;">
+                                    <div class="list-card__info">
+                                        <div class="list-card__title">
+                                            <%= list.title %>
+                                        </div>
+                                        <div class="list-card__meta" style="flex-wrap: nowrap; gap: 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                                            <span><%= list.typeLabel %></span>
+                                            <span style="color: var(--border)">&bull;</span>
+                                            <span style="display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> <%= list.dateFormatted %></span>
+                                        </div>
+                                    </div>
+                                    <div class="list-card__actions" style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <span
+                                                class="list-card__badge list-card__badge--<%= list.isActive ? 'active' : (list.isFuture ? 'future' : 'expired') %>">
+                                                <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; display: inline-block; flex-shrink: 0;"></span>
+                                                <%= list.isActive ? 'Ativa' : (list.isFuture ? 'Agendada' : 'Encerrada') %>
+                                            </span>
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500;"><i data-lucide="qr-code" class="w-3.5 h-3.5"></i> <%= list.code %></span>
+                                        </div>
+                                        <div class="list-card__count">
+                                            <div class="list-card__count-number">
+                                                <%= list.presence_count %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                                <% }) %>
+                        </div>
+                        <% } %>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>

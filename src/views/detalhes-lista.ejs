@@ -1,0 +1,159 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="page-wrapper page-wrapper--top">
+            <div class="container">
+                <div class="details-content-grid <%= !list.isActive ? 'details-content-grid--single' : '' %>">
+                    <div class="details-main-column">
+                        <div class="card card--full" style="padding-bottom: 40px;">
+                            <div class="detail-header"
+                                style="display: flex; flex-direction: column; gap: 24px; margin-bottom: 24px;">
+                                <div style="display: flex; gap: 16px; align-items: center; max-width: 100%;">
+                                    <img src="/images/<%= list.type === 'reuniao' ? 'reuniao.png' : 'treinamento.png' %>"
+                                        alt="<%= list.typeLabel %>"
+                                        style="width: 64px; height: 64px; object-fit: contain; flex-shrink: 0;">
+                                    <div class="detail-header__info" style="overflow: hidden; flex: 1;">
+                                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+                                            <h1 class="card__title"
+                                                style="margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                <%= list.title %>
+                                            </h1>
+                                            <span class="list-card__badge list-card__badge--<%= list.isActive ? 'active' : 'expired' %> detail-badge-desktop"
+                                                style="margin-bottom: 0;">
+                                                <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; display: inline-block; flex-shrink: 0;"></span>
+                                                <%= list.isActive ? 'Ativa' : 'Encerrada' %>
+                                            </span>
+                                        </div>
+                                        <div class="detail-meta-row">
+                                            <span style="font-weight: 500;"><%= list.typeLabel %></span>
+                                            <span style="color: var(--border)">&bull;</span>
+                                            <span style="display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="calendar" class="w-4 h-4"></i> <%= list.dateFormatted %></span>
+                                        </div>
+                                        <div class="detail-meta-row">
+                                            <span style="display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="qr-code" class="w-4 h-4"></i> <%= list.code %></span>
+                                            <span class="list-card__badge list-card__badge--<%= list.isActive ? 'active' : 'expired' %> detail-badge-mobile">
+                                                <span style="width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; display: inline-block; flex-shrink: 0;"></span>
+                                                <%= list.isActive ? 'Ativa' : 'Encerrada' %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="no-print">
+                                    <% if (!list.isActive) { %>
+                                        <a href="/lista/<%= list.code %>/pdf" class="btn btn--primary btn--sm"
+                                            style="display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;">
+                                            <i data-lucide="download" class="w-4 h-4"></i> Baixar Relatório
+                                        </a>
+                                        <% } else { %>
+                                            <div class="detail-actions"
+                                                style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;">
+                                                <button class="btn btn--ghost btn--sm" data-copy="<%= confirmUrl %>"
+                                                    id="btn-copiar"
+                                                    style="display: inline-flex; align-items: center; gap: 6px;">
+                                                    <i data-lucide="copy" class="w-4 h-4"></i> Copiar Link
+                                                </button>
+                                                <button class="btn btn--ghost btn--sm"
+                                                    onclick="var w=window.open('/lista-criada/<%= list.code %>','_blank','width=800,height=600'); w.onload=function(){w.print();};"
+                                                    style="display: inline-flex; align-items: center; gap: 6px;">
+                                                    <i data-lucide="printer" class="w-4 h-4"></i> Imprimir QR
+                                                </button>
+                                                <button class="btn btn--ghost btn--sm"
+                                                    onclick="window.location.reload()"
+                                                    style="display: inline-flex; align-items: center; gap: 6px;">
+                                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Atualizar
+                                                </button>
+                                            </div>
+                                            <form action="/lista/<%= list.code %>/encerrar" method="POST"
+                                                style="margin: 0;">
+                                                <button type="submit" class="btn btn--primary btn--sm"
+                                                    style="display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;"
+                                                    onclick="return confirm('Tem certeza que deseja encerrar este evento? Participantes não poderão mais assinar a lista e o relatório será liberado.')">
+                                                    <i data-lucide="lock" class="w-4 h-4"></i> Encerrar
+                                                </button>
+                                            </form>
+                                            <% } %>
+                                </div>
+                            </div>
+
+                            <div class="presence-panel">
+                                <div class="section">
+                                    <div
+                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                        <h2 class="section__title"
+                                            style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">
+                                            Presenças Confirmadas
+                                            <span
+                                                style="color: var(--primary-dark); font-size: 0.9rem;">
+                                                <%= presences.length %>
+                                            </span>
+                                        </h2>
+                                    </div>
+                                    <% if (presences.length===0) { %>
+                                        <div class="empty-state"
+                                            style="padding: 40px 24px; background: var(--bg-body); border-radius: var(--radius-md);">
+                                            <div class="empty-state__icon"><i data-lucide="users"
+                                                    style="width: 48px; height: 48px; stroke: #ccc; margin: 0 auto;"></i>
+                                            </div>
+                                            <p class="empty-state__text" style="margin-top: 16px;">Nenhuma presença
+                                                confirmada ainda.</p>
+                                        </div>
+                                        <% } else { %>
+                                            <div class="table-wrap">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Nome</th>
+                                                            <th>Cargo</th>
+                                                            <th>Setor</th>
+                                                            <th>Horário</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <% presences.forEach((p, i)=> { %>
+                                                            <tr>
+                                                                <td data-label="#" style="color: var(--text-muted);"><%= i + 1 %></td>
+                                                                <td data-label="Nome"><strong style="color: var(--secondary);"><%= p.participant_name %></strong></td>
+                                                                <td data-label="Cargo"><%= p.participant_role %></td>
+                                                                <td data-label="Setor"><%= p.participant_sector || '-' %></td>
+                                                                <td data-label="Horário"><%= new Date(p.confirmed_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }) %></td>
+                                                            </tr>
+                                                            <% }) %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% if (list.isActive) { %>
+                        <div class="details-sidebar">
+                            <div class="card no-print qr-panel" style="text-align: center; padding: 32px 24px;">
+                                <div class="section">
+                                    <div
+                                        style="background: white; padding: 16px; border-radius: 16px; display: inline-block; box-shadow: var(--shadow-sm); margin-bottom: 0;">
+                                        <img src="<%= qrDataUrl %>" alt="QR Code"
+                                            style="width: 200px; height: 200px; display: block; margin: 0 auto;">
+                                    </div>
+                                    <div class="code-display"
+                                        style="font-size: 2rem; padding: 12px 24px; margin: 0 auto; background: var(--bg-body); border-radius: 8px; max-width: fit-content;">
+                                        <%= list.code %>
+                                    </div>
+                                    <div
+                                        style="font-size: 0.85rem; color: var(--secondary); font-weight: 500; word-break: break-all; margin-bottom: 16px; user-select: all;">
+                                        <%= confirmUrl %>
+                                    </div>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+                                        Aponte a câmera ou use o código
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                </div>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>

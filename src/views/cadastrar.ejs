@@ -1,0 +1,103 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="page-wrapper page-wrapper--top">
+            <div class="card card--wide">
+                <h1 class="card__title">Cadastrar Novo Usuário</h1>
+
+                <% if (error) { %>
+                    <div class="alert alert--error" style="display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="triangle-alert" class="w-5 h-5 flex-shrink-0"></i> <span>
+                            <%= error %>
+                        </span>
+                    </div>
+                    <% } %>
+                        <% if (success) { %>
+                            <div class="alert alert--success" style="display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="check-circle" class="w-5 h-5 flex-shrink-0"></i> <span>
+                                    <%= success %>
+                                </span>
+                            </div>
+                            <% } %>
+
+                                <form action="/cadastrar" method="POST" id="form-cadastrar">
+                                    <!-- Nome Completo (primeiro, gera o username) -->
+                                    <div class="form-group">
+                                        <label for="reg-fullname">Nome Completo</label>
+                                        <input type="text" name="fullName" class="form-input"
+                                            placeholder="Nome completo do usuário" required id="reg-fullname"
+                                            pattern="^\s*\S+\s+\S+.*$" title="Informe pelo menos nome e sobrenome">
+                                    </div>
+
+                                    <!-- Usuário (gerado automaticamente) -->
+                                    <div class="form-group">
+                                        <label for="reg-username">Usuário</label>
+                                        <input type="text" name="username" class="form-input"
+                                            placeholder="Gerado automaticamente" required id="reg-username"
+                                            pattern="[a-z]+\.[a-z]+"
+                                            title="Formato: primeironome.ultimonome (minúsculas)" readonly
+                                            style="background: var(--bg-body); cursor: not-allowed;">
+                                    </div>
+
+                                    <!-- Senha -->
+                                    <div class="form-group">
+                                        <label for="reg-password">Senha (CPF)</label>
+                                        <input type="text" name="password" class="form-input"
+                                            placeholder="CPF sem pontos ou traços" required id="reg-password"
+                                            pattern="[0-9]{11}" title="CPF com 11 dígitos numéricos" maxlength="11">
+                                    </div>
+
+                                    <!-- Permissão (radio com imagens) -->
+                                    <div class="form-group">
+                                        <label>Permissão</label>
+                                        <div class="type-select">
+                                            <div class="type-select__option">
+                                                <input type="radio" name="role" value="user" id="role-user" checked>
+                                                <label for="role-user" class="type-select__label"
+                                                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                                                    <img src="/images/usuario.png" alt="Usuário"
+                                                        style="width: 48px; height: 48px; object-fit: contain;">
+                                                    <span>Usuário</span>
+                                                </label>
+                                            </div>
+                                            <div class="type-select__option">
+                                                <input type="radio" name="role" value="admin" id="role-admin">
+                                                <label for="role-admin" class="type-select__label"
+                                                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                                                    <img src="/images/administrador.png" alt="Administrador"
+                                                        style="width: 48px; height: 48px; object-fit: contain;">
+                                                    <span>Administrador</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Setor -->
+                                    <div class="form-group">
+                                        <label for="reg-sector">Setor</label>
+                                        <input type="text" name="sector" class="form-input" placeholder="Ex: TI"
+                                            id="reg-sector">
+                                    </div>
+
+                                    <button type="submit" class="btn btn--primary btn--lg" id="btn-cadastrar">Cadastrar Usuário</button>
+                                </form>
+            </div>
+        </div>
+
+        <script>
+            document.getElementById('reg-fullname').addEventListener('input', function () {
+                const parts = this.value.trim().toLowerCase().split(/\s+/);
+                const usernameField = document.getElementById('reg-username');
+                if (parts.length >= 2) {
+                    const first = parts[0].normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                    const last = parts[parts.length - 1].normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                    usernameField.value = first + '.' + last;
+                } else if (parts.length === 1 && parts[0]) {
+                    usernameField.value = parts[0].normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                } else {
+                    usernameField.value = '';
+                }
+            });
+        </script>
+
+        <%- include('partials/footer') %>

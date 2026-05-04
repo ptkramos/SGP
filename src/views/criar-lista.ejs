@@ -1,0 +1,85 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="page-wrapper page-wrapper--top">
+            <div class="card card--wide">
+                <h1 class="card__title">Criar Lista de Presença</h1>
+                <p class="card__subtitle">Preencha os dados para criar uma nova lista</p>
+
+                <% if (error) { %>
+                    <div class="alert alert--error" style="display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="triangle-alert" class="w-5 h-5 flex-shrink-0"></i> <span>
+                            <%= error %>
+                        </span>
+                    </div>
+                    <% } %>
+
+                        <form action="/criar-lista" method="POST" id="form-criar-lista">
+                            <!-- Tipo -->
+                            <div class="form-group">
+                                <label>Tipo do Evento</label>
+                                <div class="type-select">
+                                    <div class="type-select__option">
+                                        <input type="radio" name="type" value="reuniao" id="type-reuniao" required>
+                                        <label for="type-reuniao" class="type-select__label"
+                                            style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                                            <img src="/images/reuniao.png" alt="Reunião"
+                                                style="width: 48px; height: 48px; object-fit: contain;">
+                                            <span>Reunião</span>
+                                        </label>
+                                    </div>
+                                    <div class="type-select__option">
+                                        <input type="radio" name="type" value="treinamento" id="type-treinamento">
+                                        <label for="type-treinamento" class="type-select__label"
+                                            style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                                            <img src="/images/treinamento.png" alt="Treinamento"
+                                                style="width: 48px; height: 48px; object-fit: contain;">
+                                            <span>Treinamento</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Título -->
+                            <div class="form-group">
+                                <label for="title">Título da Lista</label>
+                                <input type="text" name="title" class="form-input"
+                                    placeholder="Ex: Reunião de Equipe Semanal" required id="title" maxlength="100">
+                            </div>
+
+                            <!-- Data -->
+                            <div class="form-group">
+                                <label>Quando será o evento?</label>
+                                <div class="date-toggle">
+                                    <div class="date-toggle__option">
+                                        <input type="radio" name="dateOption" value="agora" id="date-agora" checked>
+                                        <label for="date-agora" class="date-toggle__label"
+                                            style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                                            <img src="/images/agora.png" alt="Agora"
+                                                style="width: 48px; height: 48px; object-fit: contain;">
+                                            <span>Agora</span>
+                                        </label>
+                                    </div>
+                                    <div class="date-toggle__option">
+                                        <input type="radio" name="dateOption" value="agendar" id="date-agendar">
+                                        <label for="date-agendar" class="date-toggle__label"
+                                            style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                                            <img src="/images/agendar.png" alt="Agendar"
+                                                style="width: 48px; height: 48px; object-fit: contain;">
+                                            <span>Agendar</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="eventDateField" style="display: none;">
+                                <label for="eventDate">Data do Evento</label>
+                                <input type="date" name="eventDate" class="form-input" id="eventDate">
+                            </div>
+
+                            <button type="submit" class="btn btn--primary btn--lg" id="btn-criar">Criar Lista</button>
+                        </form>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>

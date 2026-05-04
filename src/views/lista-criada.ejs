@@ -1,0 +1,59 @@
+<%- include('partials/header') %>
+    <%- include('partials/nav') %>
+
+        <div class="page-wrapper page-wrapper--top">
+            <div class="card card--wide">
+                <div class="print-only" style="text-align: center; margin-bottom: 24px;">
+                    <img src="/images/logo-sgp.webp" alt="SGP - Sistema de Gerenciamento de Presença" style="height: 64px; object-fit: contain; margin: 0 auto;">
+                </div>
+                <h1 class="card__title no-print">Lista Criada com Sucesso!</h1>
+                <p class="card__subtitle no-print">Compartilhe o link, QR Code ou código com os participantes</p>
+
+                <div class="qr-container">
+                    <img src="<%= qrDataUrl %>" alt="QR Code para confirmação de presença">
+                    <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.85rem;">
+                        Escaneie o QR Code para confirmar presença
+                    </p>
+                </div>
+
+                <div class="code-display" id="list-code">
+                    <%= list.code %>
+                </div>
+
+                <div class="link-display">
+                    <span class="link-display__url" id="confirm-url">
+                        <%= confirmUrl %>
+                    </span>
+                    <button class="btn btn--sm btn--ghost" data-copy="<%= confirmUrl %>" id="btn-copiar"
+                        style="display: inline-flex; align-items: center; gap: 4px;">
+                        <i data-lucide="copy" class="w-4 h-4"></i> Copiar
+                    </button>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="event-info-print" style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px; padding: 8px 16px; border-radius: var(--radius-sm);">
+                    <img src="/images/<%= list.type === 'reuniao' ? 'reuniao.png' : 'treinamento.png' %>" alt="Tipo de Evento" style="width: 48px; height: 48px; object-fit: contain; flex-shrink: 0;">
+                    <div style="text-align: left; overflow: hidden; max-width: 100%;">
+                        <strong style="color: var(--secondary); font-size: 1.1rem; display: block; margin-bottom: 2px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= list.title %></strong>
+                        <span style="color: var(--text-muted); font-size: 0.85rem; font-weight: 500; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <%= list.type === 'reuniao' ? 'Reunião' : 'Treinamento' %> &bull; <%= new Date(list.event_date + 'T12:00:00').toLocaleDateString('pt-BR') %>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="btn-group" style="justify-content: center;">
+                    <button class="btn btn--ghost btn--sm" data-print id="btn-imprimir"
+                        style="display: inline-flex; align-items: center; gap: 4px;">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Imprimir QR
+                    </button>
+                    <a href="/lista/<%= list.code %>" class="btn btn--ghost btn--sm" id="btn-detalhes" style="display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="pen-line" class="w-4 h-4"></i> Gerenciar</a>
+                    <a href="/criar-lista" class="btn btn--primary btn--sm" id="btn-nova"
+                        style="display: inline-flex; align-items: center; gap: 4px; width: auto;">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Nova Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>
