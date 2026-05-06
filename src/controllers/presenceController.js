@@ -92,7 +92,7 @@ const presenceController = {
 
     // POST /confirmar/:code
     async confirmSubmit(req, res) {
-        const { participantName, participantRole, participantSector, participantCpf } = req.body;
+        let { participantName, participantRole, participantSector, participantCpf } = req.body;
         
         try {
             const list = listModel.findByCode(req.params.code);
@@ -181,6 +181,10 @@ const presenceController = {
                 });
             }
 
+            // Importar utilitários
+            const { normalizeName, generateUniqueUsername } = require('../utils/stringUtils');
+            participantName = normalizeName(participantName);
+
             // Auto-cadastro: criar ou atualizar participante
             const existingParticipant = participantModel.findByCpf(cleanCpf);
             if (!existingParticipant) {
@@ -192,22 +196,16 @@ const presenceController = {
                 });
 
                 // Criar conta de usuário automaticamente (se não existir)
-                const nameParts = participantName.trim().toLowerCase()
-                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                    .split(/\s+/);
-                if (nameParts.length >= 2) {
-                    const username = nameParts[0] + '.' + nameParts[nameParts.length - 1];
-                    const existingUser = userModel.findByUsername(username);
-                    if (!existingUser) {
-                        const passwordHash = await bcrypt.hash(cleanCpf, 10);
-                        userModel.create({
-                            username,
-                            passwordHash,
-                            fullName: participantName,
-                            role: 'user',
-                            sector: participantSector || null
-                        });
-                    }
+                const username = generateUniqueUsername(participantName, userModel);
+                if (username) {
+                    const passwordHash = await bcrypt.hash(cleanCpf, 10);
+                    userModel.create({
+                        username,
+                        passwordHash,
+                        fullName: participantName,
+                        role: 'user',
+                        sector: participantSector || null
+                    });
                 }
             } else {
                 participantModel.update(cleanCpf, {

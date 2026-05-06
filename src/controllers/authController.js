@@ -72,24 +72,26 @@ const authController = {
 
     // POST /cadastrar
     async registerSubmit(req, res) {
-        const { username, fullName, password, role, sector } = req.body;
+        let { fullName, password, role, sector } = req.body;
+        const { normalizeName, generateUniqueUsername } = require('../utils/stringUtils');
         
         try {
-            // Verificar se já existe
-            const existing = userModel.findByUsername(username);
-            if (existing) {
-                return res.render('cadastrar', { 
-                    title: 'Cadastrar Usuário', 
-                    error: 'Este nome de usuário já está em uso',
-                    success: null
-                });
-            }
+            fullName = normalizeName(fullName);
 
             // Validar nome completo (mínimo 2 nomes)
             if (!fullName || fullName.trim().split(/\s+/).length < 2) {
                 return res.render('cadastrar', { 
                     title: 'Cadastrar Usuário', 
                     error: 'Informe pelo menos nome e sobrenome',
+                    success: null
+                });
+            }
+
+            const username = generateUniqueUsername(fullName, userModel);
+            if (!username) {
+                return res.render('cadastrar', { 
+                    title: 'Cadastrar Usuário', 
+                    error: 'Nome inválido para geração de usuário',
                     success: null
                 });
             }
